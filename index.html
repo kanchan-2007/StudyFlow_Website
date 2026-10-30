@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block title %}StudyFlow · Smart Study Planner{% endblock %}
+{% block content %}
+<div class="slide-track" id="slideTrack">
+  <section class="slide home-slide" id="home" aria-label="Home">
+    <div class="slide-inner home-inner">
+      <div class="home-hero">
+        <div class="hero-copy">
+          <p class="eyebrow">YOUR PERSONAL STUDY SPACE</p>
+          <h1>Plan Smart.<br>Learn Better.<br><span>Achieve More.</span></h1>
+          <p class="subhead">A simple study planner to organize your daily schedule, manage tasks, and track your progress — one focused session at a time.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#tasks">＋ Add or view tasks</a>
+            <a class="btn btn-soft" href="#dashboard">Open dashboard →</a>
+          </div>
+          <div class="hero-note"><span>✦</span> Small steps add up. Keep showing up for yourself.</div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div>
+          <div class="book-illustration"><div class="book-page left-page"><span></span><span></span><span></span></div><div class="book-page right-page"><b>✦</b><span></span><span></span></div></div>
+          <span class="sparkle sparkle-one">✦</span><span class="sparkle sparkle-two">✧</span><span class="sparkle sparkle-three">✦</span>
+          <div class="floating-note"><span class="note-check">✓</span><div><strong>One task at a time</strong><small>Your progress matters</small></div></div>
+        </div>
+      </div>
+      <div class="home-bottom">
+        <div class="quote-card"><span class="quote-mark">“</span><p>Success is the sum of small efforts, repeated day in and day out.</p><small>— Robert Collier</small></div>
+        <div class="feature-intro"><p class="eyebrow">STUDY WITH CLARITY</p><h2>Everything you need to study smarter.</h2><p>Plan your week, manage your tasks, and see your progress in one place.</p></div>
+        <div class="feature-mini"><span>✓</span><strong>Task management</strong><small>Add, complete and organize study tasks.</small></div>
+        <div class="feature-mini"><span>▦</span><strong>Weekly timetable</strong><small>Build a balanced study routine.</small></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide dashboard-slide" id="dashboard" aria-label="Dashboard">
+    <div class="slide-inner">
+      <div class="section-heading"><div><p class="eyebrow">YOUR PROGRESS AT A GLANCE</p><h1>Dashboard <span>overview.</span></h1><p class="subhead">A clear view of your study goals and weekly routine.</p></div><div class="section-icon">▦</div></div>
+      <section class="stats-grid">
+  <article class="stat-card"><div class="stat-top"><span class="stat-label">Total subjects</span><span class="stat-icon purple">◈</span></div><div class="stat-number">{{ subjects|length }}</div><div class="stat-foot"><span class="dot purple-dot"></span> Keep your learning organized</div></article>
+  <article class="stat-card"><div class="stat-top"><span class="stat-label">Study tasks</span><span class="stat-icon blue">✓</span></div><div class="stat-number">{{ total_tasks }}</div><div class="stat-foot"><span class="dot blue-dot"></span> {{ completed }} completed so far</div></article>
+  <article class="stat-card"><div class="stat-top"><span class="stat-label">Completion rate</span><span class="stat-icon green">↗</span></div><div class="stat-number">{{ progress }}<small>%</small></div><div class="progress-track"><span style="width:{{ progress }}%"></span></div></article>
+</section>
+      <div class="dashboard-content">
+          <div class="panel timetable-panel" id="timetable">
+    <div class="panel-heading"><div><p class="eyebrow">YOUR ROUTINE</p><h2>Weekly timetable</h2><p class="panel-desc">A balanced plan for your study sessions.</p></div><span class="panel-symbol">▤</span></div>
+    <form class="generator-form" action="{{ url_for('generate_timetable') }}" method="post">
+      <label>Start time<select name="start_hour"><option value="15">3:00 PM</option><option value="16" selected>4:00 PM</option><option value="17">5:00 PM</option><option value="18">6:00 PM</option><option value="19">7:00 PM</option></select></label>
+      <label>Session length<select name="block_minutes"><option value="30">30 min</option><option value="45">45 min</option><option value="60" selected>60 min</option><option value="90">90 min</option><option value="120">120 min</option></select></label>
+      <label>Blocks/day<select name="blocks_per_day"><option value="1">1 block</option><option value="2">2 blocks</option><option value="3" selected>3 blocks</option><option value="4">4 blocks</option><option value="5">5 blocks</option><option value="6">6 blocks</option></select></label>
+      <button class="btn btn-primary" type="submit">✦ Generate timetable</button>
+    </form>
+    {% if sessions %}
+    <div class="timetable-list">
+      {% for day in days %}
+        {% if grouped[day] %}
+        <div class="day-row"><div class="day-name">{{ day[:3] }}<small>{{ grouped[day]|length }} sessions</small></div><div class="day-sessions">
+          {% for session in grouped[day] %}
+          <div class="session-card" style="--subject-color:{{ session.color or '#4f46e5' }}"><div class="session-time">{{ session.start_time }}–{{ session.end_time }}</div><div class="session-main"><strong>{{ session.subject_name or 'Study session' }}</strong><span>{{ session.topic }}</span></div><span class="session-dot"></span></div>
+          {% endfor %}
+        </div></div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    <form action="{{ url_for('clear_timetable') }}" method="post" class="clear-form" onsubmit="return confirm('Clear the current timetable?')"><button class="text-button" type="submit">Clear timetable</button></form>
+    {% else %}
+    <div class="empty-state"><div class="empty-art">▤</div><h3>Your week, made simpler</h3><p>Generate a timetable to turn your subjects into focused study sessions.</p><button class="btn btn-soft" type="button" onclick="document.querySelector('.generator-form').scrollIntoView({behavior:'smooth'})">Set my study routine ↓</button></div>
+    {% endif %}
+  </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide tasks-slide" id="tasks" aria-label="Tasks">
+    <div class="slide-inner">
+      <div class="section-heading"><div><p class="eyebrow">MAKE PROGRESS, ONE STEP AT A TIME</p><h1>Your study <span>tasks.</span></h1><p class="subhead">Add tasks, set priorities, and celebrate each completed step.</p></div><div class="section-icon">✓</div></div>
+      <div class="tasks-content">
+          <div class="right-column">
+    <div class="panel task-panel" id="task-list-panel">
+      <div class="panel-heading compact"><div><p class="eyebrow">STAY ON TRACK</p><h2>Study tasks</h2></div><span class="count-badge">{{ tasks|length }}</span></div>
+      <form class="add-task-form" action="{{ url_for('add_task') }}" method="post">
+        <input type="text" name="title" placeholder="What do you need to study?" required maxlength="140">
+        <div class="form-row"><select name="subject_id"><option value="">No subject</option>{% for subject in subjects %}<option value="{{ subject.id }}">{{ subject.name }}</option>{% endfor %}</select><input type="date" name="due_date" aria-label="Due date"></div>
+        <div class="form-row"><select name="priority"><option>Medium</option><option>High</option><option>Low</option></select><button class="btn btn-primary add-btn" type="submit">+ Add task</button></div>
+      </form>
+      <div class="task-list">
+        {% for task in tasks %}
+        <div class="task-item {% if task.done %}task-done{% endif %}">
+          <form action="{{ url_for('toggle_task', task_id=task.id) }}" method="post"><button class="check-btn {% if task.done %}checked{% endif %}" type="submit" aria-label="Toggle task complete">{% if task.done %}✓{% endif %}</button></form>
+          <div class="task-info"><strong>{{ task.title }}</strong><span>{% if task.subject_name %}{{ task.subject_name }} · {% endif %}{% if task.due_date %}Due {{ task.due_date }}{% else %}No due date{% endif %}</span></div>
+          <span class="priority priority-{{ task.priority|lower }}">{{ task.priority }}</span>
+          <form action="{{ url_for('delete_task', task_id=task.id) }}" method="post"><button class="delete-btn" aria-label="Delete task" title="Delete task" type="submit">×</button></form>
+        </div>
+        {% else %}
+        <div class="mini-empty">No tasks yet. Add your first study task above.</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="panel subjects-panel" id="subjects">
+      <div class="panel-heading compact"><div><p class="eyebrow">WHAT YOU'RE LEARNING</p><h2>Your subjects</h2></div><span class="panel-symbol">◈</span></div>
+      <div class="subject-list">
+        {% for subject in subjects %}
+        <div class="subject-item"><span class="subject-color" style="background:{{ subject.color }}"></span><div class="subject-name"><strong>{{ subject.name }}</strong><span>Target {{ '%g'|format(subject.target_hours) }} hrs / week</span></div><span class="subject-arrow">↗</span></div>
+        {% else %}<div class="mini-empty">Add a subject to get started.</div>{% endfor %}
+      </div>
+      <details class="subject-add"><summary>+ Add a subject</summary><form action="{{ url_for('add_subject') }}" method="post"><input name="name" placeholder="Subject name" required maxlength="80"><div class="form-row"><label>Color <input type="color" name="color" value="#4f46e5"></label><label>Hours/week <input type="number" name="target_hours" value="3" min="0.5" max="30" step="0.5"></label></div><button class="btn btn-primary" type="submit">Save subject</button></form></details>
+    </div>
+  </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide about-slide" id="about" aria-label="About StudyFlow">
+    <div class="slide-inner info-inner">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">ABOUT THE PROJECT</p>
+          <h1>StudyFlow <span>made simple.</span></h1>
+          <p class="subhead">A student study planner to help you stay organized, focused, and confident about your goals.</p>
+        </div>
+        <div class="section-icon">ⓘ</div>
+      </div>
+      
+      <div class="info-card project-overview">
+        <div class="info-card-icon">✦</div>
+        <div>
+          <h2>Project overview</h2>
+          <p>StudyFlow is a simple study-planning web application designed to help students organize subjects, manage study tasks, generate a weekly timetable, and track completion progress. The goal is to make study planning clear, practical, and easy to maintain.</p>
+        </div>
+      </div>
+      
+      <div class="info-columns">
+        <article class="info-card">
+          <h2>Technology stack</h2>
+          <ul class="tech-list">
+            <li>Python and Flask</li>
+            <li>HTML5 and CSS3</li>
+            <li>JavaScript</li>
+            <li>SQLite database</li>
+          </ul>
+        </article>
+        <article class="info-card">
+          <h2>Key features</h2>
+          <ul class="check-list">
+            <li>Create and manage tasks</li>
+            <li>Mark tasks complete or delete them</li>
+            <li>Organize subjects and target hours</li>
+            <li>Generate a weekly study timetable</li>
+            <li>View task completion progress</li>
+            <li>Separate user accounts and password recovery</li>
+            <li>Responsive interface</li>
+          </ul>
+        </article>
+      </div>
+      <div class="contact-footer">
+        <strong>StudyFlow</strong>
+        <span>Study smarter. Achieve more.</span>
+        <span>StudyFlow007@gmail.com</span>
+        <span>Maharashtra, India</span>
+        <span>© 2026 StudyFlow</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+{% endblock %}

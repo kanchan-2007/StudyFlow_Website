@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Create account' if mode == 'register' else 'Log in' }} · StudyFlow{% endblock %}
+{% block content %}
+<div class="auth-page">
+  <section class="auth-card">
+    <p class="eyebrow">YOUR PERSONAL STUDY SPACE</p>
+    {% if mode == 'register' %}<h1>Create your <span>account.</span></h1><p class="subhead">Your tasks, subjects, and timetable stay private to your account.</p>
+    <form method="post" action="{{ url_for('register') }}" class="auth-form">
+      <label>Full name<input name="name" autocomplete="name" required maxlength="100" value="{{ request.form.get('name','') }}"></label>
+      <label>Email address<input type="email" name="email" autocomplete="email" required value="{{ request.form.get('email','') }}"></label>
+      <label>Password<input type="password" name="password" autocomplete="new-password" minlength="8" required><small>Use at least 8 characters.</small></label>
+      <label>Confirm password<input type="password" name="confirm_password" autocomplete="new-password" minlength="8" required></label>
+      <button class="btn btn-primary" type="submit">Create account</button>
+    </form>
+    <p class="auth-switch">Already registered? <a href="{{ url_for('login') }}">Log in</a></p>
+    {% else %}<h1>Welcome <span>back.</span></h1><p class="subhead">Log in to continue with your personal study plan.</p>
+    <form method="post" action="{{ url_for('login') }}" class="auth-form">
+      <label>Email address<input type="email" name="email" autocomplete="email" required value="{{ request.form.get('email','') }}"></label>
+      <label>Password<input type="password" name="password" autocomplete="current-password" required></label>
+      <button class="btn btn-primary" type="submit">Log in</button>
+    </form>
+    <p class="auth-switch"><a href="{{ url_for('forgot_password') }}">Forgot password?</a></p>
+    <p class="auth-switch">New to StudyFlow? <a href="{{ url_for('register') }}">Create an account</a></p>
+    {% endif %}
+    {% if development_link %}<div class="dev-link"><strong>Local development link</strong><p>SMTP is not configured. This link is shown for local testing only; configure SMTP before public deployment.</p><a href="{{ development_link }}">Continue securely</a></div>{% endif %}
+  </section>
+</div>
+<style>
+.auth-page{min-height:65vh;display:flex;align-items:center;justify-content:center;padding:32px 16px}.auth-card{width:min(100%,520px);background:#fff;border:1px solid #e2eee7;border-radius:24px;padding:clamp(24px,5vw,44px);box-shadow:0 20px 55px #123d2d12}.auth-card h1{font-family:Manrope,sans-serif;font-size:clamp(30px,5vw,42px);line-height:1.15;margin:10px 0}.auth-card h1 span{color:#27835b}.auth-form{display:grid;gap:16px;margin-top:26px}.auth-form label{display:grid;gap:7px;font-weight:600;color:#244437}.auth-form input{width:100%;border:1px solid #d7e5dc;border-radius:12px;padding:13px 14px;font:inherit;box-sizing:border-box}.auth-form input:focus{outline:2px solid #8ac8a6;outline-offset:1px}.auth-form small{font-weight:400;color:#6b8175}.auth-form .btn{justify-content:center;border:0;cursor:pointer;font:inherit}.auth-switch{margin:18px 0 0;color:#5e7468}.auth-switch a,.dev-link a{color:#19734b;font-weight:700}.dev-link{margin-top:20px;padding:16px;background:#fff7e7;border-radius:12px;overflow-wrap:anywhere}.dev-link p{font-size:14px}.topbar-right form{margin:0}.topbar-right form button{cursor:pointer;border:0}
+</style>
+{% endblock %}

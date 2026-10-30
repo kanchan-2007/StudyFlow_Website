@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard · StudyFlow{% endblock %}
+{% block content %}
+<section class="hero-panel"><p class="eyebrow">ADMINISTRATION</p><h1>StudyFlow <span>Admin Dashboard</span></h1><p class="subhead">Review registered accounts, user task totals, verification status, and recent login/logout activity.</p></section>
+<div class="stat-grid">
+  <article class="stat-card"><span>Student accounts</span><strong>{{ totals.users }}</strong></article>
+  <article class="stat-card"><span>Total tasks</span><strong>{{ totals.tasks }}</strong></article>
+  <article class="stat-card"><span>Recorded logins</span><strong>{{ totals.logins }}</strong></article>
+  <article class="stat-card"><span>Awaiting verification</span><strong>{{ totals.unverified }}</strong></article>
+</div>
+<section class="content-panel"><h2>Registered users</h2><div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Registered</th><th>Email status</th><th>Tasks</th><th>Completed</th><th>Details</th></tr></thead><tbody>
+{% for u in users if u.role == 'student' %}<tr><td>{{ u.name }}</td><td>{{ u.email }}</td><td>{{ u.created_at }}</td><td>{{ 'Verified' if u.verified else 'Pending' }}</td><td>{{ u.task_count }}</td><td>{{ u.completed_count }}</td><td><a href="{{ url_for('admin_user_tasks', user_id=u.id) }}">View tasks</a></td></tr>{% else %}<tr><td colspan="7">No student accounts yet.</td></tr>{% endfor %}
+</tbody></table></div></section>
+<section class="content-panel"><h2>Recent login history</h2><div class="table-wrap"><table><thead><tr><th>User</th><th>Email</th><th>Login time</th><th>Logout time</th></tr></thead><tbody>{% for h in history %}<tr><td>{{ h.name }}</td><td>{{ h.email }}</td><td>{{ h.login_at }}</td><td>{{ h.logout_at or 'Session still open / logout not recorded' }}</td></tr>{% else %}<tr><td colspan="4">No login events recorded yet.</td></tr>{% endfor %}</tbody></table></div><p class="muted">Shows the latest 100 recorded events. Refresh after users sign in or out.</p></section>
+{% endblock %}

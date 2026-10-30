@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}User details · StudyFlow{% endblock %}
+{% block content %}
+<section class="hero-panel"><p class="eyebrow">ADMIN · USER DETAILS</p><h1>{{ user.name }}</h1><p class="subhead">{{ user.email }} · Email {{ 'verified' if user.verified else 'not verified' }} · Registered {{ user.created_at }}</p><a href="{{ url_for('admin_dashboard') }}">← Back to Admin Dashboard</a></section>
+<section class="content-panel"><h2>Subjects</h2>{% if subjects %}<ul>{% for s in subjects %}<li>{{ s.name }} — target {{ s.target_hours }} hours/week</li>{% endfor %}</ul>{% else %}<p>No subjects.</p>{% endif %}</section>
+<section class="content-panel"><h2>Tasks</h2><div class="table-wrap"><table><thead><tr><th>Task</th><th>Subject</th><th>Due date</th><th>Priority</th><th>Status</th></tr></thead><tbody>{% for t in tasks %}<tr><td>{{ t.title }}</td><td>{{ t.subject_name or '—' }}</td><td>{{ t.due_date or '—' }}</td><td>{{ t.priority }}</td><td>{{ 'Completed' if t.done else 'Pending' }}</td></tr>{% else %}<tr><td colspan="5">No tasks added.</td></tr>{% endfor %}</tbody></table></div></section>
+{% endblock %}

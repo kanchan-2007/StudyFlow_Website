@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#123d2d">
+  <title>{% block title %}StudyFlow · Smart Study Planner{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <main class="main-content">
+    <header class="topbar">
+      <a class="brand" href="{{ url_for('index') if logged_in_user and logged_in_user.verified else url_for('login') }}" aria-label="StudyFlow home"><span class="brand-icon">✦</span><span>Study<span class="brand-light">Flow</span></span></a>
+      {% if logged_in_user and logged_in_user.verified %}
+      <nav class="top-navigation" aria-label="Main navigation">
+        <a class="nav-item active"
+           href="{{ url_for('index') }}#home"
+           data-slide="home"><span>⌂</span> Home</a>
+
+        <a class="nav-item"
+           href="{{ url_for('index') }}#dashboard"
+           data-slide="dashboard"><span>▦</span> Dashboard</a>
+
+        <a class="nav-item"
+           href="{{ url_for('index') }}#tasks"
+           data-slide="tasks"><span>✓</span> Tasks</a>
+
+        <a class="nav-item"
+           href="{{ url_for('index') }}#about"
+           data-slide="about"><span>ⓘ</span> About</a>
+
+        {% if logged_in_user.role == 'admin' %}<a class="nav-item" href="{{ url_for('admin_dashboard') }}">Admin</a>{% endif %}
+      </nav>
+      {% endif %}
+      <div class="topbar-right">{% if logged_in_user and logged_in_user.verified %}<span class="today-pill">● {{ logged_in_user.name }}</span><form method="post" action="{{ url_for('logout') }}"><button class="btn btn-soft" type="submit">Log out</button></form>{% else %}<span class="today-pill">● Your learning workspace</span>{% endif %}<div class="avatar">S</div></div>
+    </header>
+    <div class="page-wrap">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}<div class="flash-wrap">{% for category, message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
